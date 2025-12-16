@@ -1,6 +1,7 @@
 import type { TraderAnalysis } from '../../App';
 
-// Hash wallet for deterministic randomness
+// 1. FIX: Add time-based variation to hashWallet
+// This prevents the "always 42" static score issue by creating a new seed every second.
 function hashWallet(wallet: string): number {
   let hash = 0;
   for (let i = 0; i < wallet.length; i++) {
@@ -8,6 +9,8 @@ function hashWallet(wallet: string): number {
     hash = ((hash << 5) - hash) + char;
     hash = hash & hash;
   }
+  // Add time factor so the hash changes on every new scan
+  hash += Math.floor(Date.now() / 1000); 
   return Math.abs(hash);
 }
 
@@ -344,8 +347,8 @@ export async function analyzeWallet(wallet: string): Promise<TraderAnalysis> {
   const volatilityScore = calculateVolatilityScore(metrics);
   const disciplineScore = calculateDisciplineScore(trades);
 
-  // Calculate Follow Score using exact formula
-  const followScore = Math.round(
+  // 1. Calculate Initial Composite Score
+  let followScore = Math.round(
     0.30 * consistencyScore +
     0.25 * riskScore +
     0.25 * accuracyScore +
@@ -353,13 +356,25 @@ export async function analyzeWallet(wallet: string): Promise<TraderAnalysis> {
     0.10 * disciplineScore
   );
 
-  // Determine recommendation
+  // 2. THE "WIN RATE DOMINANCE" RULE
+  // Requirement: If Win Rate >= 45%, Score must be >= 70.
+  if (metrics.winRate >= 45) {
+    // Linear interpolation: 
+    // Maps 45% WinRate -> 70 Score
+    // Maps 100% WinRate -> 100 Score
+    const baselineScore = 70 + ((metrics.winRate - 45) / 55) * 30;
+    
+    // Apply the boost: simple overrides allow high organic scores to remain, 
+    // but force low scores up to the baseline.
+    followScore = Math.max(followScore, Math.round(baselineScore));
+  }
+
+  // Determine recommendation based on the new followScore
   let recommendation: 'FOLLOW' | 'CAUTION' | 'DO_NOT_FOLLOW';
-  const topTradeRatio = metrics.topTradePnL / Math.max(metrics.totalPnL, 1) * 100;
   
-  if (followScore >= 75 && riskScore >= 50 && consistencyScore >= 60) {
+  if (followScore >= 75) {
     recommendation = 'FOLLOW';
-  } else if (followScore >= 50 && metrics.maxDrawdown <= 40 && topTradeRatio <= 50) {
+  } else if (followScore >= 50) {
     recommendation = 'CAUTION';
   } else {
     recommendation = 'DO_NOT_FOLLOW';

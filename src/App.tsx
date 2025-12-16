@@ -4,7 +4,7 @@ import { WalletInput } from './components/WalletInput';
 import { LoadingState } from './components/LoadingState';
 import { Dashboard } from './components/Dashboard';
 import { Footer } from './components/Footer';
-import { analyzeWallet } from './hooks/lib/analyzer';
+import { analyzeWallet } from './lib/analyzer';
 import { InteractiveBackground } from './components/InteractiveBackground';
 
 export interface TraderAnalysis {
