@@ -4,35 +4,86 @@
 
 @layer base {
   :root {
-    --radius: 0.5rem;
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%
+    /* Default Light Mode (Optional - keeping generic but tactical) */
+    --background: 0 0% 100%;
+    --foreground: 224 71% 4%;
+    --card: 0 0% 100%;
+    --card-foreground: 224 71% 4%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 224 71% 4%;
+    --primary: 33 100% 50%; /* Tactical Orange */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 224 71% 4%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 220 14% 96%;
+    --muted-foreground: 220 8% 46%;
+    --accent: 51 100% 50%; /* Luminous Gold */
+    --accent-foreground: 224 71% 4%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 33 100% 50%; /* Orange Ring */
+    --radius: 0.75rem;
   }
 
+  /* THE QELVA / EYE THEME (Dark Mode) */
   .dark {
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%
+    /* Deep Void #050914 -> 224deg 60% 5% */
+    --background: 224 70% 2%; 
+    --foreground: 210 40% 98%;
+
+    /* Glassmorphism Card Backgrounds (Slightly lighter than void) */
+    --card: 224 60% 4%;
+    --card-foreground: 210 40% 98%;
+    --popover: 224 60% 7%;
+    --popover-foreground: 210 40% 98%;
+
+    /* Tactical Orange #FF8C00 -> 33deg 100% 50% */
+    --primary: 33 100% 50%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Deep Navy Secondary (for contrast) */
+    --secondary: 217 33% 17%;
+    --secondary-foreground: 210 40% 98%;
+
+    /* Muted Text */
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20% 65%;
+
+    /* Luminous Gold #FFD700 -> 51deg 100% 50% */
+    --accent: 51 100% 50%;
+    --accent-foreground: 224 60% 5%;
+
+    /* Error States */
+    --destructive: 0 62% 30%;
+    --destructive-foreground: 210 40% 98%;
+
+    /* Borders (Dark Orange/Gold hint or subtle grey) */
+    --border: 33 100% 20%; /* Subtle Orange Border */
+    --input: 217 33% 17%;
+    --ring: 33 100% 50%;
   }
 }
 
-
-
-img {
-  object-position: top;
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
 }
 
-.fixed {
-  position: fixed;
+/* Custom Utilities for the Glow Effects */
+@layer utilities {
+  .text-glow {
+    text-shadow: 0 0 20px rgba(255, 140, 0, 0.5);
+  }
+  .box-glow {
+    box-shadow: 0 0 40px -10px rgba(255, 140, 0, 0.3);
+  }
+  .glass-panel {
+    @apply bg-background/50 backdrop-blur-md border border-white/5;
+  }
 }

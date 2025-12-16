@@ -1,4 +1,4 @@
-import { ArrowLeft, TrendingUp, TrendingDown, Target, Shield, BarChart2, Activity, Clock, Award, AlertTriangle, CheckCircle, XCircle } from 'lucide-react';
+import { ArrowLeft, TrendingUp, TrendingDown, Target, Shield, BarChart2, Activity, Clock,  AlertTriangle, CheckCircle, XCircle, ScanLine, AlertCircle } from 'lucide-react';
 import type { TraderAnalysis } from '../App';
 
 interface DashboardProps {
@@ -10,93 +10,147 @@ export function Dashboard({ analysis, onReset }: DashboardProps) {
   const { followScore, recommendation, summary, scores, metrics, strengths, weaknesses, recentTrades, pnlHistory } = analysis;
 
   return (
-    <div className="px-4 py-8">
-      <div className="max-w-6xl mx-auto">
+    <div className="px-4 py-8 relative z-20">
+      <div className="max-w-6xl mx-auto space-y-8">
+        
+        {/* Navigation */}
         <button
           onClick={onReset}
-          className="flex items-center gap-2 text-gray-400 hover:text-white mb-6 transition-colors"
+          className="group flex items-center gap-2 text-primary/60 hover:text-primary transition-colors font-mono text-sm tracking-wider"
         >
-          <ArrowLeft className="w-4 h-4" />
-          Analyze Another Wallet
+          <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
+          RETURN_TO_SCANNER
         </button>
 
+        {/* Top Section: Score & Summary */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-1">
             <ScoreCard score={followScore} recommendation={recommendation} wallet={analysis.wallet} />
           </div>
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2">
             <SummaryCard summary={summary} strengths={strengths} weaknesses={weaknesses} />
           </div>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mt-6">
+        {/* Metrics Grid */}
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
           <MetricCard icon={<TrendingUp />} label="Total PnL" value={`$${metrics.totalPnL.toLocaleString()}`} positive={metrics.totalPnL >= 0} />
           <MetricCard icon={<Target />} label="Win Rate" value={`${metrics.winRate}%`} positive={metrics.winRate >= 50} />
           <MetricCard icon={<BarChart2 />} label="Avg ROI" value={`${metrics.avgROI}%`} positive={metrics.avgROI >= 0} />
-          <MetricCard icon={<Shield />} label="Max Drawdown" value={`${metrics.maxDrawdown}%`} positive={metrics.maxDrawdown < 25} />
+          <MetricCard icon={<Shield />} label="Max Drawdown" value={`${metrics.maxDrawdown}%`} positive={metrics.maxDrawdown < 25} invert />
           <MetricCard icon={<Activity />} label="Total Trades" value={metrics.totalTrades.toString()} />
           <MetricCard icon={<Clock />} label="Active Days" value={metrics.activeDays.toString()} />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
-          <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
-            <h3 className="text-lg font-semibold text-white mb-4">Performance Radar</h3>
-            <RadarChartComponent scores={scores} />
+        {/* Charts Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          
+          {/* 1. TACTICAL RADAR */}
+          <div className="relative rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.5)] overflow-hidden">
+            <div className="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
+                <ScanLine className="w-32 h-32 text-primary" />
+            </div>
+            <div className="p-6 border-b border-white/5 bg-white/5">
+                <h3 className="text-sm font-bold text-white flex items-center gap-2 font-mono tracking-wider">
+                    <span className="w-1.5 h-1.5 bg-primary rounded-full animate-pulse"></span>
+                    TACTICAL_RADAR //
+                </h3>
+            </div>
+            <div className="p-6">
+                <RadarChartComponent scores={scores} />
+            </div>
           </div>
           
-          <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
-            <h3 className="text-lg font-semibold text-white mb-4">Cumulative PnL</h3>
-            <PnLChartComponent data={pnlHistory} />
+          {/* 2. CUMULATIVE PERFORMANCE */}
+          <div className="relative rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.5)] overflow-hidden">
+            <div className="p-6 border-b border-white/5 bg-white/5">
+                <h3 className="text-sm font-bold text-white flex items-center gap-2 font-mono tracking-wider">
+                    <span className="w-1.5 h-1.5 bg-accent rounded-full"></span>
+                    CUMULATIVE_PERFORMANCE //
+                </h3>
+            </div>
+            <div className="p-6">
+                <PnLChartComponent data={pnlHistory} />
+            </div>
           </div>
         </div>
 
-        <div className="mt-6 bg-gray-900/50 border border-gray-800 rounded-xl p-6">
-          <h3 className="text-lg font-semibold text-white mb-4">Recent Trades</h3>
+        {/* 3. RECENT TRANSACTIONS TABLE */}
+        <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.5)] overflow-hidden">
+          <div className="p-6 border-b border-white/5 bg-white/5">
+            <h3 className="text-sm font-bold text-white flex items-center gap-2 font-mono tracking-wider">
+                <Activity className="w-4 h-4 text-primary" />
+                RECENT_TRANSACTIONS //
+            </h3>
+          </div>
           <TradesTable trades={recentTrades} />
         </div>
+
       </div>
     </div>
   );
 }
 
+// ----------------------------------------------------------------------
+// SUB-COMPONENTS (Updated with Glassmorphism)
+// ----------------------------------------------------------------------
+
 function ScoreCard({ score, recommendation, wallet }: { score: number; recommendation: string; wallet: string }) {
   const getRecommendationStyle = () => {
     switch (recommendation) {
-      case 'FOLLOW': return { bg: 'bg-green-900/30', border: 'border-green-700', text: 'text-green-400', label: 'FOLLOW' };
-      case 'CAUTION': return { bg: 'bg-yellow-900/30', border: 'border-yellow-700', text: 'text-yellow-400', label: 'CAUTION' };
-      default: return { bg: 'bg-red-900/30', border: 'border-red-700', text: 'text-red-400', label: 'DO NOT FOLLOW' };
+      case 'FOLLOW': return { bg: 'bg-primary/10', border: 'border-primary/50', text: 'text-primary', label: 'FOLLOW_TARGET', icon: CheckCircle };
+      case 'CAUTION': return { bg: 'bg-accent/10', border: 'border-accent/50', text: 'text-accent', label: 'PROCEED_WITH_CAUTION', icon: AlertTriangle };
+      default: return { bg: 'bg-red-500/10', border: 'border-red-500/50', text: 'text-red-500', label: 'AVOID_INTERACTION', icon: XCircle };
     }
   };
 
   const style = getRecommendationStyle();
-  const scoreColor = score >= 75 ? '#22c55e' : score >= 50 ? '#eab308' : '#ef4444';
+  const Icon = style.icon;
+  const radius = 45;
+  const circumference = 2 * Math.PI * radius;
+  const strokeDashoffset = circumference - (score / 100) * circumference;
 
   return (
-    <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6 text-center">
-      <p className="text-sm text-gray-400 mb-2 truncate" title={wallet}>{wallet.slice(0, 10)}...{wallet.slice(-8)}</p>
+    <div className="h-full rounded-2xl border border-primary/30 bg-white/5 backdrop-blur-xl shadow-[0_0_40px_rgba(255,140,0,0.1)] flex flex-col items-center justify-center relative overflow-hidden p-6">
       
-      <div className="relative w-40 h-40 mx-auto my-6">
-        <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
-          <circle cx="50" cy="50" r="45" fill="none" stroke="#1f2937" strokeWidth="10" />
+      {/* Background decoration */}
+      <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent pointer-events-none" />
+      
+      <p className="font-mono text-[10px] text-primary/60 mb-6 tracking-[0.2em] uppercase border border-primary/20 px-2 py-1 rounded">
+        ID: {wallet.slice(0, 4)}...{wallet.slice(-4)}
+      </p>
+      
+      <div className="relative w-48 h-48 mb-6 group cursor-default">
+        <div className="absolute inset-0 bg-primary/20 blur-[60px] rounded-full scale-75 group-hover:scale-100 transition-transform duration-700" />
+        <svg className="w-full h-full transform -rotate-90 relative z-10" viewBox="0 0 100 100">
+          <circle cx="50" cy="50" r={radius} fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="6" />
           <circle 
-            cx="50" cy="50" r="45" fill="none" 
-            stroke={scoreColor}
-            strokeWidth="10" 
+            cx="50" cy="50" r={radius} fill="none" 
+            stroke="url(#scoreGradient)" 
+            strokeWidth="6" 
             strokeLinecap="round"
-            strokeDasharray={`${score * 2.83} 283`}
+            strokeDasharray={circumference}
+            strokeDashoffset={strokeDashoffset}
+            className="transition-all duration-1000 ease-out"
           />
+          <defs>
+            <linearGradient id="scoreGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#FF8C00" />
+              <stop offset="100%" stopColor="#FFD700" />
+            </linearGradient>
+          </defs>
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className="text-4xl font-bold" style={{ color: scoreColor }}>{score}</span>
-          <span className="text-xs text-gray-500">FOLLOW SCORE</span>
+          <span className="text-5xl font-bold text-white tracking-tighter drop-shadow-[0_0_15px_rgba(255,140,0,0.5)]">
+            {score}
+          </span>
+          <span className="text-[10px] text-primary/80 font-mono tracking-[0.2em] mt-1">SCORE</span>
         </div>
       </div>
 
-      <div className={`inline-flex items-center gap-2 px-4 py-2 ${style.bg} ${style.border} border rounded-full`}>
-        {recommendation === 'FOLLOW' && <CheckCircle className="w-4 h-4" />}
-        {recommendation === 'CAUTION' && <AlertTriangle className="w-4 h-4" />}
-        {recommendation === 'DO_NOT_FOLLOW' && <XCircle className="w-4 h-4" />}
-        <span className={`font-semibold ${style.text}`}>{style.label}</span>
+      <div className={`flex items-center gap-2 px-4 py-2 ${style.bg} ${style.border} border rounded-lg backdrop-blur-md shadow-lg`}>
+        <Icon className={`w-4 h-4 ${style.text}`} />
+        <span className={`text-xs font-bold tracking-wider ${style.text}`}>{style.label}</span>
       </div>
     </div>
   );
@@ -104,60 +158,76 @@ function ScoreCard({ score, recommendation, wallet }: { score: number; recommend
 
 function SummaryCard({ summary, strengths, weaknesses }: { summary: string; strengths: string[]; weaknesses: string[] }) {
   return (
-    <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
-      <h3 className="text-lg font-semibold text-white mb-3">Intelligence Summary</h3>
-      <p className="text-gray-300 mb-6">{summary}</p>
+    <div className="h-full rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.5)] flex flex-col overflow-hidden">
+      <div className="p-6 border-b border-white/5 bg-white/5">
+        <h3 className="text-sm font-bold text-white flex items-center gap-2 font-mono tracking-wider">
+          <ScanLine className="w-4 h-4 text-accent" />
+          INTEL_SUMMARY //
+        </h3>
+      </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div>
-          <h4 className="flex items-center gap-2 text-green-400 font-medium mb-3">
-            <Award className="w-4 h-4" /> Strengths
-          </h4>
-          <ul className="space-y-2">
-            {strengths.map((s, i) => (
-              <li key={i} className="flex items-start gap-2 text-sm text-gray-300">
-                <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
-                {s}
-              </li>
-            ))}
-          </ul>
-        </div>
+      <div className="p-8 flex-grow flex flex-col justify-center">
+        <p className="text-gray-300 mb-8 leading-relaxed font-light text-lg">
+          {summary}
+        </p>
         
-        <div>
-          <h4 className="flex items-center gap-2 text-red-400 font-medium mb-3">
-            <AlertTriangle className="w-4 h-4" /> Weaknesses
-          </h4>
-          <ul className="space-y-2">
-            {weaknesses.map((w, i) => (
-              <li key={i} className="flex items-start gap-2 text-sm text-gray-300">
-                <XCircle className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
-                {w}
-              </li>
-            ))}
-          </ul>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="bg-white/5 rounded-xl p-5 border border-white/5">
+            <h4 className="flex items-center gap-2 text-primary font-mono text-xs tracking-wider mb-4 border-b border-primary/20 pb-2 uppercase">
+              Strengths
+            </h4>
+            <ul className="space-y-3">
+              {strengths.map((s, i) => (
+                <li key={i} className="flex items-start gap-3 text-sm text-gray-300">
+                  <CheckCircle className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                  {s}
+                </li>
+              ))}
+            </ul>
+          </div>
+          
+          <div className="bg-white/5 rounded-xl p-5 border border-white/5">
+            <h4 className="flex items-center gap-2 text-red-400 font-mono text-xs tracking-wider mb-4 border-b border-red-500/20 pb-2 uppercase">
+              Weaknesses
+            </h4>
+            <ul className="space-y-3">
+              {weaknesses.map((w, i) => (
+                <li key={i} className="flex items-start gap-3 text-sm text-gray-300">
+                  <AlertCircle className="w-4 h-4 text-red-500/80 shrink-0 mt-0.5" />
+                  {w}
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       </div>
     </div>
   );
 }
 
-function MetricCard({ icon, label, value, positive }: { icon: React.ReactNode; label: string; value: string; positive?: boolean }) {
+function MetricCard({ icon, label, value, positive, invert }: { icon: React.ReactNode; label: string; value: string; positive?: boolean; invert?: boolean }) {
+  let valueColor = 'text-white';
+  if (positive === true) valueColor = 'text-accent'; 
+  if (positive === false) valueColor = 'text-red-400';
+
   return (
-    <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-4">
-      <div className={`w-8 h-8 rounded-lg flex items-center justify-center mb-2 ${
-        positive === undefined ? 'bg-blue-600/20 text-blue-400' :
-        positive ? 'bg-green-600/20 text-green-400' : 'bg-red-600/20 text-red-400'
-      }`}>
-        {icon}
+    <div className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-md p-4 transition-all duration-300 hover:bg-white/10 hover:border-primary/30 hover:shadow-[0_0_20px_rgba(255,140,0,0.1)] group">
+      <div className="flex items-center gap-3 mb-2">
+        <div className="p-1.5 rounded-md bg-black/20 text-gray-400 group-hover:text-primary transition-colors">
+            <div className="w-4 h-4">{icon}</div>
+        </div>
+        <p className="text-[10px] text-gray-500 font-mono uppercase tracking-wider">{label}</p>
       </div>
-      <p className="text-xs text-gray-500">{label}</p>
-      <p className={`text-lg font-semibold ${
-        positive === undefined ? 'text-white' :
-        positive ? 'text-green-400' : 'text-red-400'
-      }`}>{value}</p>
+      <p className={`text-xl font-bold font-mono ${valueColor} group-hover:scale-105 transition-transform origin-left`}>
+        {value}
+      </p>
     </div>
   );
 }
+
+// ----------------------------------------------------------------------
+// CHART COMPONENTS (Visuals Only)
+// ----------------------------------------------------------------------
 
 function RadarChartComponent({ scores }: { scores: TraderAnalysis['scores'] }) {
   const metrics = [
@@ -170,9 +240,7 @@ function RadarChartComponent({ scores }: { scores: TraderAnalysis['scores'] }) {
   
   const size = 240;
   const center = size / 2;
-  const levels = 5;
   const maxRadius = 90;
-  
   const angleStep = (2 * Math.PI) / metrics.length;
   
   const getPoint = (value: number, index: number) => {
@@ -190,59 +258,36 @@ function RadarChartComponent({ scores }: { scores: TraderAnalysis['scores'] }) {
   }).join(' ');
   
   return (
-    <div className="flex justify-center">
-      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
-        {/* Grid levels */}
-        {Array.from({ length: levels }).map((_, level) => {
-          const radius = ((level + 1) / levels) * maxRadius;
-          const points = metrics.map((_, i) => {
-            const angle = i * angleStep - Math.PI / 2;
-            return `${center + radius * Math.cos(angle)},${center + radius * Math.sin(angle)}`;
-          }).join(' ');
-          return <polygon key={level} points={points} fill="none" stroke="#374151" strokeWidth="1" />;
+    <div className="flex justify-center py-4 relative">
+      <div className="absolute inset-0 bg-primary/5 blur-3xl rounded-full pointer-events-none" />
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="relative z-10">
+        {/* Grid */}
+        {[0.25, 0.5, 0.75, 1].map((scale, i) => {
+           const radius = scale * maxRadius;
+           const points = metrics.map((_, j) => {
+             const angle = j * angleStep - Math.PI / 2;
+             return `${center + radius * Math.cos(angle)},${center + radius * Math.sin(angle)}`;
+           }).join(' ');
+           return <polygon key={i} points={points} fill="none" stroke="rgba(255, 255, 255, 0.1)" strokeWidth="1" />;
         })}
-        
-        {/* Axis lines */}
+        {/* Axes */}
         {metrics.map((_, i) => {
           const angle = i * angleStep - Math.PI / 2;
-          return (
-            <line
-              key={i}
-              x1={center}
-              y1={center}
-              x2={center + maxRadius * Math.cos(angle)}
-              y2={center + maxRadius * Math.sin(angle)}
-              stroke="#374151"
-              strokeWidth="1"
-            />
-          );
+          return <line key={i} x1={center} y1={center} x2={center + maxRadius * Math.cos(angle)} y2={center + maxRadius * Math.sin(angle)} stroke="rgba(255, 255, 255, 0.1)" strokeWidth="1" />;
         })}
-        
-        {/* Data polygon */}
-        <polygon points={polygonPoints} fill="rgba(59, 130, 246, 0.3)" stroke="#3b82f6" strokeWidth="2" />
-        
-        {/* Data points */}
+        {/* Shape */}
+        <polygon points={polygonPoints} fill="rgba(255, 140, 0, 0.2)" stroke="#FF8C00" strokeWidth="2" strokeLinejoin="round" />
+        {/* Dots */}
         {metrics.map((m, i) => {
           const p = getPoint(m.value, i);
-          return <circle key={i} cx={p.x} cy={p.y} r="4" fill="#3b82f6" />;
+          return <circle key={i} cx={p.x} cy={p.y} r="3" fill="#FFD700" className="drop-shadow-[0_0_5px_rgba(255,215,0,0.8)]" />;
         })}
-        
         {/* Labels */}
         {metrics.map((m, i) => {
           const angle = i * angleStep - Math.PI / 2;
-          const labelRadius = maxRadius + 25;
-          const x = center + labelRadius * Math.cos(angle);
-          const y = center + labelRadius * Math.sin(angle);
+          const labelRadius = maxRadius + 20;
           return (
-            <text
-              key={i}
-              x={x}
-              y={y}
-              textAnchor="middle"
-              dominantBaseline="middle"
-              fill="#9ca3af"
-              fontSize="11"
-            >
+            <text key={i} x={center + labelRadius * Math.cos(angle)} y={center + labelRadius * Math.sin(angle)} textAnchor="middle" dominantBaseline="middle" fill="#9ca3af" fontSize="10" className="font-mono uppercase tracking-wide">
               {m.name}
             </text>
           );
@@ -253,11 +298,11 @@ function RadarChartComponent({ scores }: { scores: TraderAnalysis['scores'] }) {
 }
 
 function PnLChartComponent({ data }: { data: TraderAnalysis['pnlHistory'] }) {
-  if (data.length === 0) return <div className="h-64 flex items-center justify-center text-gray-500">No data available</div>;
+  if (data.length === 0) return <div className="h-64 flex items-center justify-center text-gray-500 font-mono">NO_DATA</div>;
   
   const width = 500;
   const height = 240;
-  const padding = { top: 20, right: 20, bottom: 40, left: 60 };
+  const padding = { top: 20, right: 20, bottom: 40, left: 50 };
   const chartWidth = width - padding.left - padding.right;
   const chartHeight = height - padding.top - padding.bottom;
   
@@ -266,8 +311,8 @@ function PnLChartComponent({ data }: { data: TraderAnalysis['pnlHistory'] }) {
   const maxPnl = Math.max(...pnlValues, 0);
   const pnlRange = maxPnl - minPnl || 1;
   
-  const getX = (index: number) => padding.left + (index / (data.length - 1 || 1)) * chartWidth;
-  const getY = (value: number) => padding.top + chartHeight - ((value - minPnl) / pnlRange) * chartHeight;
+  const getX = (i: number) => padding.left + (i / (data.length - 1)) * chartWidth;
+  const getY = (v: number) => padding.top + chartHeight - ((v - minPnl) / pnlRange) * chartHeight;
   
   const linePath = data.map((d, i) => `${i === 0 ? 'M' : 'L'} ${getX(i)} ${getY(d.pnl)}`).join(' ');
   const areaPath = `${linePath} L ${getX(data.length - 1)} ${getY(minPnl)} L ${getX(0)} ${getY(minPnl)} Z`;
@@ -277,47 +322,16 @@ function PnLChartComponent({ data }: { data: TraderAnalysis['pnlHistory'] }) {
       <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} className="mx-auto">
         <defs>
           <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.4" />
-            <stop offset="100%" stopColor="#3b82f6" stopOpacity="0.05" />
+            <stop offset="0%" stopColor="#FFD700" stopOpacity="0.15" />
+            <stop offset="100%" stopColor="#FF8C00" stopOpacity="0" />
           </linearGradient>
         </defs>
+        {/* Grid Lines */}
+        <line x1={padding.left} y1={padding.top} x2={padding.left} y2={padding.top + chartHeight} stroke="rgba(255,255,255,0.1)" />
+        <line x1={padding.left} y1={getY(0)} x2={padding.left + chartWidth} y2={getY(0)} stroke="rgba(255,255,255,0.1)" strokeDasharray="4 4" />
         
-        {/* Y axis */}
-        <line x1={padding.left} y1={padding.top} x2={padding.left} y2={padding.top + chartHeight} stroke="#374151" />
-        
-        {/* X axis */}
-        <line x1={padding.left} y1={padding.top + chartHeight} x2={padding.left + chartWidth} y2={padding.top + chartHeight} stroke="#374151" />
-        
-        {/* Y axis labels */}
-        {[0, 0.5, 1].map((ratio, i) => {
-          const value = minPnl + ratio * pnlRange;
-          const y = getY(value);
-          return (
-            <g key={i}>
-              <line x1={padding.left - 5} y1={y} x2={padding.left} y2={y} stroke="#374151" />
-              <text x={padding.left - 10} y={y} textAnchor="end" dominantBaseline="middle" fill="#9ca3af" fontSize="10">
-                ${Math.round(value)}
-              </text>
-            </g>
-          );
-        })}
-        
-        {/* Grid lines */}
-        {[0, 0.5, 1].map((ratio, i) => {
-          const y = padding.top + ratio * chartHeight;
-          return <line key={i} x1={padding.left} y1={y} x2={padding.left + chartWidth} y2={y} stroke="#1f2937" strokeDasharray="4,4" />;
-        })}
-        
-        {/* Area */}
         <path d={areaPath} fill="url(#areaGrad)" />
-        
-        {/* Line */}
-        <path d={linePath} fill="none" stroke="#3b82f6" strokeWidth="2" />
-        
-        {/* Data points */}
-        {data.map((d, i) => (
-          <circle key={i} cx={getX(i)} cy={getY(d.pnl)} r="3" fill="#3b82f6" />
-        ))}
+        <path d={linePath} fill="none" stroke="#FFD700" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="drop-shadow-[0_0_8px_rgba(255,215,0,0.5)]" />
       </svg>
     </div>
   );
@@ -326,35 +340,39 @@ function PnLChartComponent({ data }: { data: TraderAnalysis['pnlHistory'] }) {
 function TradesTable({ trades }: { trades: TraderAnalysis['recentTrades'] }) {
   return (
     <div className="overflow-x-auto">
-      <table className="w-full">
+      <table className="w-full text-left">
         <thead>
-          <tr className="border-b border-gray-800">
-            <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Market</th>
-            <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Outcome</th>
-            <th className="text-right py-3 px-4 text-sm font-medium text-gray-400">PnL</th>
-            <th className="text-right py-3 px-4 text-sm font-medium text-gray-400">ROI</th>
-            <th className="text-right py-3 px-4 text-sm font-medium text-gray-400">Date</th>
+          <tr className="border-b border-white/5 bg-white/5">
+            <th className="py-4 px-6 text-xs font-mono text-gray-400 uppercase tracking-wider">Market</th>
+            <th className="py-4 px-6 text-xs font-mono text-gray-400 uppercase tracking-wider">Outcome</th>
+            <th className="py-4 px-6 text-xs font-mono text-gray-400 uppercase tracking-wider text-right">PnL</th>
+            <th className="py-4 px-6 text-xs font-mono text-gray-400 uppercase tracking-wider text-right">ROI</th>
+            <th className="py-4 px-6 text-xs font-mono text-gray-400 uppercase tracking-wider text-right">Date</th>
           </tr>
         </thead>
         <tbody>
           {trades.map((trade, i) => (
-            <tr key={i} className="border-b border-gray-800/50 hover:bg-gray-800/30">
-              <td className="py-3 px-4 text-sm text-gray-300 max-w-[200px] truncate">{trade.market}</td>
-              <td className="py-3 px-4">
-                <span className={`inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-medium ${
-                  trade.outcome === 'WIN' ? 'bg-green-900/30 text-green-400' : 'bg-red-900/30 text-red-400'
+            <tr key={i} className="border-b border-white/5 hover:bg-white/5 transition-colors group">
+              <td className="py-4 px-6 text-sm text-gray-300 font-medium max-w-[200px] truncate group-hover:text-white transition-colors">
+                {trade.market}
+              </td>
+              <td className="py-4 px-6">
+                <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-[10px] font-bold tracking-wide uppercase border ${
+                  trade.outcome === 'WIN' 
+                    ? 'bg-primary/10 text-primary border-primary/20' 
+                    : 'bg-white/5 text-gray-500 border-white/10'
                 }`}>
                   {trade.outcome === 'WIN' ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
                   {trade.outcome}
                 </span>
               </td>
-              <td className={`py-3 px-4 text-sm text-right font-medium ${trade.pnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+              <td className={`py-4 px-6 text-sm text-right font-mono ${trade.pnl >= 0 ? 'text-accent' : 'text-red-400'}`}>
                 {trade.pnl >= 0 ? '+' : ''}${trade.pnl.toFixed(2)}
               </td>
-              <td className={`py-3 px-4 text-sm text-right ${trade.roi >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+              <td className={`py-4 px-6 text-sm text-right font-mono ${trade.roi >= 0 ? 'text-accent' : 'text-red-400'}`}>
                 {trade.roi >= 0 ? '+' : ''}{trade.roi}%
               </td>
-              <td className="py-3 px-4 text-sm text-right text-gray-500">
+              <td className="py-4 px-6 text-sm text-right text-gray-500 font-mono">
                 {new Date(trade.date).toLocaleDateString()}
               </td>
             </tr>

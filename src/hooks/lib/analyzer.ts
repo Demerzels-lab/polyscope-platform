@@ -1,8 +1,4 @@
-// 1. Create folder: src/lib
-// 2. Create file: src/lib/analyzer.ts
-// 3. Paste this entire code:
-
-import type { TraderAnalysis } from '../App';
+import type { TraderAnalysis } from '../../App';
 
 // Hash wallet for deterministic randomness
 function hashWallet(wallet: string): number {
@@ -314,10 +310,9 @@ export async function analyzeWallet(wallet: string): Promise<TraderAnalysis> {
   let useRealData = false;
 
   try {
-    // 1.5s timeout for faster fallback
     const tradesRes = await fetch(`https://polymarket.com/api/trades?wallet=${wallet}`, {
       headers: { 'Accept': 'application/json' },
-      signal: AbortSignal.timeout(1500)
+      signal: AbortSignal.timeout(5000)
     });
     if (tradesRes.ok) {
       const tradesData = await tradesRes.json();
