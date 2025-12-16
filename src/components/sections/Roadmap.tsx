@@ -4,28 +4,28 @@ import { motion } from 'framer-motion';
 const milestones = [
   {
     version: "v1.0",
-    date: "Dec 2024",
+    date: "Dec 2025",
     title: "Initial Launch",
     status: "completed",
     items: ["Follow Score Engine", "Radar Charts", "PnL Tracking", "Basic Wallet Analysis"]
   },
   {
     version: "v1.1",
-    date: "Q1 2025",
+    date: "Q1 2026",
     title: "Enhanced Analytics",
     status: "upcoming",
     items: ["Historical Score Tracking", "Comparative Analysis", "Market Category Breakdown"]
   },
   {
     version: "v1.2",
-    date: "Q2 2025",
+    date: "Q2 2026",
     title: "Portfolio Features",
     status: "upcoming",
     items: ["Watchlist Functionality", "Multiple Wallet Tracking", "Email Alerts"]
   },
   {
     version: "v2.0",
-    date: "Q3 2025",
+    date: "Q3 2026",
     title: "Advanced AI",
     status: "upcoming",
     items: ["ML Prediction Models", "Whale Tracking", "Copy Trading Signals"]
