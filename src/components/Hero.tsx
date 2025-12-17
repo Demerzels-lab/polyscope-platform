@@ -11,7 +11,7 @@ interface HeroProps {
 
 export function Hero({ onAnalyze, isLoading }: HeroProps) {
   const [copied, setCopied] = useState(false);
-  const caAddress = "DDLgZscBViQ4BMzdT53X8tHLZvHASZposb3Lh1xSpump";
+  const caAddress = "6GBSVR8cDZZg1Dqrdovfq34Af4jP4mebmGdunoNspump";
 
   const handleCopy = () => {
     navigator.clipboard.writeText(caAddress);
@@ -86,7 +86,7 @@ export function Hero({ onAnalyze, isLoading }: HeroProps) {
                     </div>
 
                     {/* CA SECTION: Glass Container with Copy Function (FULL ADDRESS) */}
-                    {/* <div className="flex items-center justify-center lg:justify-start">
+                    <div className="flex items-center justify-center lg:justify-start">
                         <div 
                           className="group flex items-center gap-3 px-4 py-2 bg-black/40 backdrop-blur-sm border border-white/5 rounded-full hover:border-primary/20 transition-all cursor-pointer"
                           onClick={handleCopy}
@@ -103,7 +103,7 @@ export function Hero({ onAnalyze, isLoading }: HeroProps) {
                                 <Copy className="w-3.5 h-3.5 text-gray-500 group-hover:text-white transition-colors" />
                             )}
                         </div>
-                    </div> */}
+                    </div>
 
                 </div>
             </div>
