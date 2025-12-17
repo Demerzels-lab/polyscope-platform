@@ -1,19 +1,28 @@
-import { Activity, TrendingUp, Shield } from 'lucide-react';
-import { PrivacyOrbit } from './PrivacyOrbit'; // Import the new component
+import { Link } from 'react-router-dom';
+import { Activity, TrendingUp, Shield, FileText, Github, Twitter } from 'lucide-react';
+import { PrivacyOrbit } from './PrivacyOrbit';
+import { WalletInput } from './WalletInput'; // Import the WalletInput component
 
-export function Hero() {
+interface HeroProps {
+  onAnalyze: (wallet: string) => Promise<void>;
+  isLoading: boolean;
+}
+
+export function Hero({ onAnalyze, isLoading }: HeroProps) {
   return (
     <section className="pt-20 pb-16 px-4 relative overflow-hidden">
       {/* Container with Grid Layout for Side-by-Side Effect */}
       <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
         
-        {/* LEFT COLUMN: Text Content */}
-        <div className="text-center lg:text-left space-y-6 relative z-10">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 border border-primary/20 rounded-full text-primary text-xs font-medium mb-4">
+        {/* LEFT COLUMN: Text Content & Interaction */}
+        <div className="text-center lg:text-left space-y-8 relative z-10">
+            {/* Badge */}
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 border border-primary/20 rounded-full text-primary text-xs font-medium">
                 <span className="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
                 AI-POWERED INTEL
             </div>
 
+            {/* Main Title */}
             <h1 className="text-5xl md:text-7xl font-bold leading-tight">
                 <span className="block text-white">PolyScope</span>
                 <span className="bg-gradient-to-r from-primary via-orange-400 to-accent bg-clip-text text-transparent">
@@ -21,22 +30,54 @@ export function Hero() {
                 </span>
             </h1>
             
+            {/* Description */}
             <p className="text-xl text-muted-foreground max-w-xl mx-auto lg:mx-0">
                 Analyze any Polymarket trader's wallet address. Get comprehensive 
                 performance evaluation, risk assessment, and data-driven intelligence.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-4">
-                <button className="px-8 py-3 bg-primary hover:bg-orange-600 text-white font-bold rounded-lg shadow-[0_0_20px_rgba(255,140,0,0.4)] transition-all transform hover:scale-105">
-                    Launch App
-                </button>
-                <button className="px-8 py-3 bg-transparent border border-white/10 hover:border-primary/50 text-white rounded-lg transition-all hover:bg-white/5">
-                    View Docs
-                </button>
+            {/* NEW: System Target Acquisition Section (Replaces Launch Button) */}
+            <div className="pt-4 max-w-md mx-auto lg:mx-0">
+                {/* Added justify classes to align label with input on different screens */}
+                
+                {/* Embedded Wallet Input */}
+                <WalletInput onAnalyze={onAnalyze} isLoading={isLoading} />
+
+                {/* Documentation Link (Below Input) */}
+                {/* Added mt-6 for the requested gap */}
+                <div className="flex justify-center lg:justify-start mt-6 ml-4">
+                    <Link 
+                        to="/docs" 
+                        className="group inline-flex items-center gap-2 px-6 py-2 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-primary/30 rounded-lg text-sm text-gray-400 hover:text-white transition-all"
+                    >
+                        <FileText className="w-4 h-4 group-hover:text-primary transition-colors" />
+                        <span>Access Documentation Protocols</span>
+                    </Link>
+                </div>
+
+                {/* Social Links */}
+                <div className="flex justify-center lg:justify-start gap-4 mt-4 ml-4">
+                    <a 
+                        href="https://github.com/Demerzels-lab/polyscope-platform" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="w-8 h-8 flex items-center justify-center bg-white/5 hover:bg-white/10 border border-white/10 hover:border-primary/30 rounded-lg text-gray-400 hover:text-white transition-all"
+                    >
+                        <Github className="w-4 h-4" />
+                    </a>
+                    <a 
+                        href="https://x.com/PolyscopeAI" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="w-8 h-8 flex items-center justify-center bg-white/5 hover:bg-white/10 border border-white/10 hover:border-primary/30 rounded-lg text-gray-400 hover:text-white transition-all"
+                    >
+                        <Twitter className="w-4 h-4" />
+                    </a>
+                </div>
             </div>
         </div>
 
-        {/* RIGHT COLUMN: The Privacy Orbit (The 1:1 Mimic) */}
+        {/* RIGHT COLUMN: The Privacy Orbit */}
         <div className="relative mt-12 lg:mt-0">
             <PrivacyOrbit />
         </div>
@@ -71,15 +112,14 @@ function FeatureCard({ icon, title, description }: { icon: React.ReactNode; titl
   return (
     <div className="group relative p-6 rounded-2xl overflow-hidden transition-all duration-500 hover:-translate-y-2">
       
-      {/* 1. GLASS BASE: Very transparent background with blur */}
+      {/* 1. GLASS BASE */}
       <div className="absolute inset-0 bg-white/3 backdrop-blur-md border border-white/10 rounded-2xl transition-colors duration-500 group-hover:border-primary/40 group-hover:bg-primary/5" />
       
-      {/* 2. HOVER GLOW: A subtle gradient blob that appears on hover */}
+      {/* 2. HOVER GLOW */}
       <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
-      {/* 3. CONTENT (Relative z-index to sit on top of glass) */}
+      {/* 3. CONTENT */}
       <div className="relative z-10">
-        {/* Icon Container - Glowing Tactical Orange */}
         <div className="w-12 h-12 mb-4 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20 group-hover:scale-110 group-hover:bg-primary/20 group-hover:border-primary/50 transition-all duration-300 shadow-[0_0_15px_rgba(255,140,0,0.1)]">
           <div className="text-primary group-hover:text-accent transition-colors duration-300">
             {icon}

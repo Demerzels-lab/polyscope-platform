@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion'; // Import framer-motion
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'; // Removed Link import
+import { motion, AnimatePresence } from 'framer-motion';
 import { Hero } from './components/Hero';
-import { WalletInput } from './components/WalletInput';
+// Removed WalletInput import as it is now in Hero
 import { LoadingState } from './components/LoadingState';
 import { Dashboard } from './components/Dashboard';
 import { Footer } from './components/Footer';
@@ -13,7 +13,7 @@ import { Roadmap } from './components/sections/Roadmap';
 import { FAQ } from './components/sections/FAQ';
 import { DocsPage } from './pages/Docs';
 
-// ... (TraderAnalysis interface remains exactly the same, omitting for brevity) ...
+// ... (TraderAnalysis interface remains exactly the same) ...
 export interface TraderAnalysis {
   wallet: string;
   followScore: number;
@@ -87,29 +87,23 @@ function LandingPage() {
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.5 }}
           >
-            <Hero />
+            {/* UPDATE: Hero now takes onAnalyze and isLoading */}
+            <Hero onAnalyze={handleAnalyze} isLoading={loading} />
             
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="max-w-xl mx-auto -mt-8 relative z-20 mb-20 px-4"
-            >
-              <WalletInput onAnalyze={handleAnalyze} isLoading={loading} />
+            {/* REMOVED: The standalone WalletInput section that was here */}
+            
+            <div className="max-w-xl mx-auto relative z-20 px-4">
               {error && (
-                <div className="mt-4 p-4 bg-destructive/10 border border-destructive/20 rounded-lg flex items-center justify-center text-destructive font-mono text-sm backdrop-blur-md">
+                <div className="mb-20 p-4 bg-destructive/10 border border-destructive/20 rounded-lg flex items-center justify-center text-destructive font-mono text-sm backdrop-blur-md">
                   ERROR: {error}
                 </div>
               )}
-            </motion.div>
+            </div>
 
             {loading && <LoadingState />}
             
             {!loading && (
               <div className="relative z-10 space-y-0">
-                 {/* Using motion.div for sections to slide in from bottom 
-                    viewport={{ once: true }} ensures they don't disappear when scrolling up
-                 */}
                  <motion.div
                    initial={{ opacity: 0, y: 50 }}
                    whileInView={{ opacity: 1, y: 0 }}
@@ -119,7 +113,7 @@ function LandingPage() {
                    <HowItWorks />
                  </motion.div>
 
-                 <Roadmap /> {/* Roadmap has its own internal motion logic now */}
+                 <Roadmap />
 
                  <motion.div
                    initial={{ opacity: 0, y: 50 }}
@@ -157,9 +151,7 @@ function App() {
         <InteractiveBackground />
         
         <div className="relative z-10">
-          <nav className="absolute top-0 right-0 p-6 z-50 flex gap-6">
-             <Link to="/docs" className="text-sm font-medium text-gray-400 hover:text-white transition-colors">Documentation</Link>
-          </nav>
+          {/* UPDATE: Removed the top-right <nav> element entirely */}
 
           <Routes>
             <Route path="/" element={<LandingPage />} />

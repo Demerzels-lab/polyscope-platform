@@ -23,8 +23,8 @@ export function WalletInput({ onAnalyze, isLoading = false }: WalletInputProps) 
   };
 
   return (
-    <section className="pb-20 px-4 relative z-20">
-      <div className="max-w-xl mx-auto">
+    <section className="px-4 relative z-20">
+      <div className="max-w-xl mx-auto lg:mx-0">
         <form onSubmit={handleSubmit} className="relative group">
           
           <div className="absolute -top-7 left-1 text-[10px] font-mono text-primary/60 tracking-[0.2em] uppercase">

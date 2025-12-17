@@ -1,12 +1,10 @@
-import { Activity } from 'lucide-react';
-
 export function Footer() {
   return (
     <footer className="border-t border-gray-800 py-8 px-4 mt-auto">
       <div className="max-w-6xl mx-auto">
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <Activity className="w-5 h-5 text-blue-400" />
+            <img src="/logo.jpeg" alt="PolyScope Logo" className="w-5 h-5" />
             <span className="font-semibold text-white">PolyScope</span>
           </div>
           
