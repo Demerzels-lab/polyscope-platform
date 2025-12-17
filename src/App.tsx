@@ -1,8 +1,7 @@
-import { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'; // Removed Link import
+import { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Hero } from './components/Hero';
-// Removed WalletInput import as it is now in Hero
 import { LoadingState } from './components/LoadingState';
 import { Dashboard } from './components/Dashboard';
 import { Footer } from './components/Footer';
@@ -13,7 +12,6 @@ import { Roadmap } from './components/sections/Roadmap';
 import { FAQ } from './components/sections/FAQ';
 import { DocsPage } from './pages/Docs';
 
-// ... (TraderAnalysis interface remains exactly the same) ...
 export interface TraderAnalysis {
   wallet: string;
   followScore: number;
@@ -61,7 +59,8 @@ function LandingPage() {
     setAnalysis(null);
 
     try {
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Simulate processing time for the loader effect
+      await new Promise(resolve => setTimeout(resolve, 4500)); 
       const result = await analyzeWallet(wallet);
       setAnalysis(result);
     } catch (err) {
@@ -78,6 +77,11 @@ function LandingPage() {
 
   return (
     <div className="relative min-h-screen flex flex-col">
+       {/* FIX: LoadingState moved OUTSIDE of motion.div 
+          This ensures position:fixed works relative to the viewport, not the animation container.
+       */}
+       {loading && <LoadingState />}
+
        <AnimatePresence mode='wait'>
          {!analysis ? (
           <motion.div 
@@ -87,10 +91,7 @@ function LandingPage() {
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.5 }}
           >
-            {/* UPDATE: Hero now takes onAnalyze and isLoading */}
             <Hero onAnalyze={handleAnalyze} isLoading={loading} />
-            
-            {/* REMOVED: The standalone WalletInput section that was here */}
             
             <div className="max-w-xl mx-auto relative z-20 px-4">
               {error && (
@@ -100,8 +101,7 @@ function LandingPage() {
               )}
             </div>
 
-            {loading && <LoadingState />}
-            
+            {/* Content hides when loading to give focus to the overlay, or stays visible if you prefer */}
             {!loading && (
               <div className="relative z-10 space-y-0">
                  <motion.div
@@ -145,14 +145,31 @@ function LandingPage() {
 }
 
 function App() {
+  const [initialLoading, setInitialLoading] = useState(true);
+
+  useEffect(() => {
+    // Show loading for 3 seconds on every app load
+    const timer = setTimeout(() => {
+      setInitialLoading(false);
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (initialLoading) {
+    return (
+      <div className="relative min-h-screen text-white selection:bg-primary/30 overflow-x-hidden font-sans">
+        <InteractiveBackground />
+        <LoadingState />
+      </div>
+    );
+  }
+
   return (
     <Router>
       <div className="relative min-h-screen text-white selection:bg-primary/30 overflow-x-hidden font-sans">
         <InteractiveBackground />
         
         <div className="relative z-10">
-          {/* UPDATE: Removed the top-right <nav> element entirely */}
-
           <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route path="/docs" element={<DocsPage />} />
